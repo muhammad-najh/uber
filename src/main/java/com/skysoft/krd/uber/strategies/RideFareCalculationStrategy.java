@@ -1,7 +1,8 @@
 package com.skysoft.krd.uber.strategies;
 
-import com.skysoft.krd.uber.dto.RideRequestDto;
+import com.skysoft.krd.uber.entities.RideRequest;
 
 public interface RideFareCalculationStrategy {
-    double calculateFare(RideRequestDto rideRequestDto);
+    double RIDE_FARE_MULTIPLIER =10;
+    double calculateFare(RideRequest rideRequest);
 }

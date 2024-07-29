@@ -1,0 +1,5 @@
+1// ride will be created after driver accept riderequest
+2//hardcoded value SRID 4326 Resource Ideintfer
+3//all bussines logic should be a service
+4//1.12 daq follow explanation
+5//functional interface is a part of stream API have one method and we can use lamda expression

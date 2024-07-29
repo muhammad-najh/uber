@@ -4,6 +4,8 @@ import com.skysoft.krd.uber.dto.DriverDto;
 import com.skysoft.krd.uber.dto.RideDto;
 import com.skysoft.krd.uber.dto.RideRequestDto;
 import com.skysoft.krd.uber.dto.RiderDto;
+import com.skysoft.krd.uber.entities.Rider;
+import com.skysoft.krd.uber.entities.User;
 
 import java.util.List;
 
@@ -14,4 +16,5 @@ public interface RiderService {
     DriverDto rateDriver(Long rideId, Integer rate);
     RiderDto getMyProfile(); //no need to have id because it will come across spring security concepts
     List<RideDto> getMyAllMyRides();
+    Rider createNewRider(User user);
 }
