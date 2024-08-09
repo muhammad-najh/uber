@@ -23,7 +23,7 @@ public class Driver {
     private String vehicleId;
     private boolean available;
     @Column(columnDefinition = "Geometry(point,4326)")
-    Point currentLocation;
+    private Point currentLocation;
 
 
 }

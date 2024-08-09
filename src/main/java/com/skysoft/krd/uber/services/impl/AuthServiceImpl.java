@@ -7,6 +7,7 @@ import com.skysoft.krd.uber.entities.Rider;
 import com.skysoft.krd.uber.entities.User;
 import com.skysoft.krd.uber.entities.enums.Role;
 import com.skysoft.krd.uber.exceptions.RunTimeConflicException;
+import com.skysoft.krd.uber.exceptions.RuntimeConflictException;
 import com.skysoft.krd.uber.repositories.UserRepository;
 import com.skysoft.krd.uber.services.AuthService;
 import com.skysoft.krd.uber.services.RiderService;
@@ -14,6 +15,7 @@ import com.skysoft.krd.uber.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -29,11 +31,12 @@ public class AuthServiceImpl  implements AuthService {
     }
 
     @Override
+    @Transactional
     public UserDto signup(SignupDto signupDto) {
         User userDB=userRepository.findByEmail(signupDto.getEmail()).orElse(null);
 
         if(userDB !=null)
-            throw new RunTimeConflicException("User already exists with email: "+signupDto.getEmail());
+            throw new RuntimeConflictException("User already exists with email: done"+signupDto.getEmail());
 
         User user = modelMapper.map(signupDto, User.class);
         user.setRole(Set.of(Role.RIDER));

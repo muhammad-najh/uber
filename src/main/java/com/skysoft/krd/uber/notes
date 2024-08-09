@@ -3,3 +3,7 @@
 3//all bussines logic should be a service
 4//1.12 daq follow explanation
 5//functional interface is a part of stream API have one method and we can use lamda expression
+6// @Transaction it works in service layer and its for data consisty
+7// statgy pattern applied for stratiges in this app we have interfaces
+and there is classes implement this interface then depend on certain rule in
+stragtegy manager you will return strategy

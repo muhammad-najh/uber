@@ -13,13 +13,12 @@ import java.util.List;
  //all bussines logic should be a service
 @RequiredArgsConstructor
 @Service
-@Primary
 public class DriverMatchingNearestDriverStrategy implements DriverMatchingStrategy {
      private final DriverRepository driverRepository;
 
      @Override
     public List<Driver> findMatchingDrivers(RideRequest rideRequest) {
 
-        return driverRepository.findMatchingDrivers(rideRequest.getPickupLocation());
+        return driverRepository.findTenNearestDrivers(rideRequest.getPickupLocation());
     }
 }

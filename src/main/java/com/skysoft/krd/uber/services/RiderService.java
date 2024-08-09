@@ -17,4 +17,5 @@ public interface RiderService {
     RiderDto getMyProfile(); //no need to have id because it will come across spring security concepts
     List<RideDto> getMyAllMyRides();
     Rider createNewRider(User user);
+    Rider getCurrentRider();
 }

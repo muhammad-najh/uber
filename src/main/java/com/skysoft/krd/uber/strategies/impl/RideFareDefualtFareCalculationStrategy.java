@@ -12,12 +12,11 @@ import org.springframework.stereotype.Service;
 @Primary
 public class RideFareDefualtFareCalculationStrategy implements RideFareCalculationStrategy {
     private  final DistanceService distanceService;
+
     @Override
     public double calculateFare(RideRequest rideRequest) {
-        Double distance=distanceService.calculateDistance(rideRequest.getPickupLocation(),rideRequest.getDropOffLocation());
-        //ToDO call the third party api to fetch the distance OSRM
-
-        distanceService.calculateDistance(rideRequest.getPickupLocation(),rideRequest.getDropOffLocation());
+        double distance=distanceService.calculateDistance(rideRequest.getPickupLocation(),
+                rideRequest.getDropOffLocation());
         return distance*RIDE_FARE_MULTIPLIER;
     }
 }
