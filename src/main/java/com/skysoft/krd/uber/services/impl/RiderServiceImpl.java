@@ -4,22 +4,21 @@ import com.skysoft.krd.uber.dto.DriverDto;
 import com.skysoft.krd.uber.dto.RideDto;
 import com.skysoft.krd.uber.dto.RideRequestDto;
 import com.skysoft.krd.uber.dto.RiderDto;
+import com.skysoft.krd.uber.entities.Driver;
 import com.skysoft.krd.uber.entities.RideRequest;
 import com.skysoft.krd.uber.entities.Rider;
 import com.skysoft.krd.uber.entities.User;
 import com.skysoft.krd.uber.entities.enums.RideRequestStatus;
-import com.skysoft.krd.uber.repositories.RideRepository;
 import com.skysoft.krd.uber.repositories.RideRequestRepository;
 import com.skysoft.krd.uber.repositories.RiderRepository;
 import com.skysoft.krd.uber.services.RiderService;
-import com.skysoft.krd.uber.strategies.DriverMatchingStrategy;
-import com.skysoft.krd.uber.strategies.RideFareCalculationStrategy;
 import com.skysoft.krd.uber.strategies.RideStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -34,6 +33,7 @@ public class RiderServiceImpl implements RiderService {
     private final RideStrategyManager rideStrategyManager;
 
     @Override
+    @Transactional
     public RideRequestDto requestRide(RideRequestDto rideRequestDto) {
         Rider rider=getCurrentRider(); //get current rider
         RideRequest rideRequest= modelMapper.map(rideRequestDto, RideRequest.class);
@@ -42,8 +42,8 @@ public class RiderServiceImpl implements RiderService {
         rideRequest.setRideRequestStatus(RideRequestStatus.PENDING);
         rideRequest.setFare(fare);
         rideRequestRepository.save(rideRequest);
-        rideStrategyManager.driverMatchingStrategy(rider.getRating()).findMatchingDrivers(rideRequest);
-
+        List<Driver> drivers=rideStrategyManager.driverMatchingStrategy(rider.getRating()).findMatchingDrivers(rideRequest);
+        // TODO send notifications to all drivers
         return modelMapper.map(rideRequest, RideRequestDto.class);
     }
 
@@ -77,7 +77,7 @@ public class RiderServiceImpl implements RiderService {
     public Rider getCurrentRider() {
         //TODO implement Spring Secuirty Concepts to get Current Rider Information
 
-        return riderRepository.findById(1l).orElseThrow(() -> {
+        return riderRepository.findById(1L).orElseThrow(() -> {
             throw new NoSuchElementException("No Rider found");
         }); //DEMO
     }

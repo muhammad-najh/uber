@@ -13,15 +13,13 @@ import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class RideDto {
 
     private Long id;
 
-    private Point pickupLocation;
+    private PointDto pickupLocation; //envelope will occur if its not PointDto
 
-    private Point dropOffLocation;
+    private PointDto dropOffLocation;
 
     private LocalDateTime createdTime;
 
@@ -34,6 +32,8 @@ public class RideDto {
     private RideStatus rideStatus;
 
     private Double fare;
+
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
+    private String otp;
 }

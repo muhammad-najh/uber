@@ -4,12 +4,10 @@ import com.skysoft.krd.uber.entities.RideRequest;
 import com.skysoft.krd.uber.services.DistanceService;
 import com.skysoft.krd.uber.strategies.RideFareCalculationStrategy;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-@Primary
 public class RideFareDefualtFareCalculationStrategy implements RideFareCalculationStrategy {
     private  final DistanceService distanceService;
 
