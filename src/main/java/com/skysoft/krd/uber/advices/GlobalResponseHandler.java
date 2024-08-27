@@ -17,6 +17,8 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+          if(request.getURI().getPath().contains("/v3/api-docs")) return body;
+
            if(body instanceof APIResponse<?>) {
                return body;
            }

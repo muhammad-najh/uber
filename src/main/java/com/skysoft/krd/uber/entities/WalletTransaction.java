@@ -22,7 +22,7 @@ public class WalletTransaction {
     private Double amount;
     private TransactionType transactionType;
     private TransactionMethod transactionMethod;
-    @OneToOne
+    @ManyToOne
     private Ride ride;
     private String transactionId;
     @CreationTimestamp
