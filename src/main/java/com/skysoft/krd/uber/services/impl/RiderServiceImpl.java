@@ -4,18 +4,21 @@ import com.skysoft.krd.uber.dto.DriverDto;
 import com.skysoft.krd.uber.dto.RideDto;
 import com.skysoft.krd.uber.dto.RideRequestDto;
 import com.skysoft.krd.uber.dto.RiderDto;
-import com.skysoft.krd.uber.entities.Driver;
-import com.skysoft.krd.uber.entities.RideRequest;
-import com.skysoft.krd.uber.entities.Rider;
-import com.skysoft.krd.uber.entities.User;
+import com.skysoft.krd.uber.entities.*;
 import com.skysoft.krd.uber.entities.enums.RideRequestStatus;
+import com.skysoft.krd.uber.entities.enums.RideStatus;
+import com.skysoft.krd.uber.repositories.DriverRepository;
 import com.skysoft.krd.uber.repositories.RideRequestRepository;
 import com.skysoft.krd.uber.repositories.RiderRepository;
+import com.skysoft.krd.uber.services.DriverService;
+import com.skysoft.krd.uber.services.RideService;
 import com.skysoft.krd.uber.services.RiderService;
 import com.skysoft.krd.uber.strategies.RideStrategyManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,10 @@ public class RiderServiceImpl implements RiderService {
     private final RideRequestRepository rideRequestRepository;
     private final RiderRepository riderRepository;
     private final RideStrategyManager rideStrategyManager;
+    private final RideService rideService;
+    private final DriverService driverService;
+    private final DriverRepository driverRepository;
+
 
     @Override
     @Transactional
@@ -49,22 +56,52 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public RideDto cancelRide(Long rideId) {
-        return null;
+        Rider rider=getCurrentRider();
+        Ride ride=rideService.getRideById(rideId);
+
+        if(!rider.equals(ride.getRider())){
+            throw new RuntimeException("Rider does not belong to this ride "+rideId);
+
+        }
+
+        if (!ride.getRideStatus().equals(RideStatus.CONFIRMED)) {
+                throw new RuntimeException("Ride can not be cancelled, because ride status is "+ride.getRideStatus());
+        }
+
+        Ride savedRide = rideService.updateRideStatus(ride, RideStatus.CANCELLED);
+        driverService.updateDriverAvailability(ride.getDriver(),true);
+
+        return modelMapper.map(savedRide, RideDto.class);
     }
 
     @Override
     public DriverDto rateDriver(Long rideId, Integer rate) {
-        return null;
+        Driver driver=rideService.getRideById(rideId).getDriver();
+        double numberOfRides = rideService.numberRidesOfDriver(driver);
+        if(numberOfRides == 0){
+            numberOfRides=1;
+        }
+        double rating=(driver.getRating()+rate)/numberOfRides;
+        driver.setRating(rating);
+        Driver savedDriver=driverRepository.save(driver);
+
+        return modelMapper.map(savedDriver, DriverDto.class);
     }
 
     @Override
     public RiderDto getMyProfile() {
-        return null;
+
+        Rider currentRider = getCurrentRider();
+        return modelMapper.map(currentRider, RiderDto.class);
     }
 
     @Override
-    public List<RideDto> getMyAllMyRides() {
-        return List.of();
+    public Page<RideDto> getMyAllMyRides(PageRequest pageRequest) {
+
+        Rider currentRider=getCurrentRider();
+        return rideService.getAllRidesOfDRider(currentRider,pageRequest).map(
+                ride -> modelMapper.map(ride, RideDto.class)
+        );
     }
 
     @Override

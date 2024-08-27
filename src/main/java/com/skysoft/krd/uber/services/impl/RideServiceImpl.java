@@ -4,6 +4,7 @@ import com.skysoft.krd.uber.dto.RideRequestDto;
 import com.skysoft.krd.uber.entities.Driver;
 import com.skysoft.krd.uber.entities.Ride;
 import com.skysoft.krd.uber.entities.RideRequest;
+import com.skysoft.krd.uber.entities.Rider;
 import com.skysoft.krd.uber.entities.enums.RideRequestStatus;
 import com.skysoft.krd.uber.entities.enums.RideStatus;
 import com.skysoft.krd.uber.exceptions.RideNotFoundException;
@@ -31,10 +32,7 @@ public class RideServiceImpl  implements RideService {
         return rideRepository.findById(id).orElseThrow(()-> new RideNotFoundException("Ride Not Found Exception"));
     }
 
-    @Override
-    public void matchWithDriver(RideRequestDto rideRequestDto) {
 
-    }
 
     @Override
     public Ride createNewRide(RideRequest rideRequest, Driver driver) {
@@ -58,14 +56,25 @@ public class RideServiceImpl  implements RideService {
     }
 
     @Override
-    public Page<Ride> getAllRidesOfDRider(Long riderId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfDRider(Rider rider, PageRequest pageRequest) {
+        return rideRepository.findByRider(rider,pageRequest);
     }
 
     @Override
-    public Page<Ride> getAllRidesOfDriver(Long driverId, PageRequest pageRequest) {
-        return null;
+    public Page<Ride> getAllRidesOfDriver(Driver driver, PageRequest pageRequest) {
+        return rideRepository.findByDriver(driver,pageRequest);
     }
+
+    @Override
+    public Double numberRidesOfRider(Rider rider) {
+        return 0.0;
+    }
+
+    @Override
+    public Double numberRidesOfDriver(Driver driver) {
+        return 0.0;
+    }
+
 
     private String generateRandomOtp(){
         Random rand = new Random();

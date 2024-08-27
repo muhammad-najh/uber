@@ -12,6 +12,7 @@ import com.skysoft.krd.uber.repositories.UserRepository;
 import com.skysoft.krd.uber.services.AuthService;
 import com.skysoft.krd.uber.services.RiderService;
 import com.skysoft.krd.uber.services.UserService;
+import com.skysoft.krd.uber.services.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class AuthServiceImpl  implements AuthService {
     private final ModelMapper modelMapper;
     private final UserRepository userRepository;
     private final RiderService riderService;
+    private final WalletService walletService;
     @Override
     public String login(String username, String password) {
         return "";
@@ -44,7 +46,8 @@ public class AuthServiceImpl  implements AuthService {
 
         //creating user related entities
 
-        Rider rider = riderService.createNewRider(savedUser);
+        riderService.createNewRider(savedUser);
+        walletService.createNewWallet(savedUser);
         // TODO add wallet related service here
 
         return modelMapper.map(savedUser, UserDto.class);

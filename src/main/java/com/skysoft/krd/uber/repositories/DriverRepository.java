@@ -28,4 +28,5 @@ public interface DriverRepository extends JpaRepository<Driver,Long> {
             "order by d.rating DESC " +
             "LIMIT 10 ",nativeQuery = true )
     List<Driver>findTenNearbyTopRatedDrivers(Point pickupLocation);
+
 }
