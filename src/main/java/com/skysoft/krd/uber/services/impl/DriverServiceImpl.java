@@ -6,18 +6,13 @@ import com.skysoft.krd.uber.dto.RiderDto;
 import com.skysoft.krd.uber.entities.Driver;
 import com.skysoft.krd.uber.entities.Ride;
 import com.skysoft.krd.uber.entities.RideRequest;
-import com.skysoft.krd.uber.entities.Rider;
 import com.skysoft.krd.uber.entities.enums.RideRequestStatus;
 import com.skysoft.krd.uber.entities.enums.RideStatus;
 import com.skysoft.krd.uber.exceptions.DriverNotAvailableException;
 import com.skysoft.krd.uber.exceptions.RideRequestCanNotBeAcceptedException;
 import com.skysoft.krd.uber.repositories.DriverRepository;
-import com.skysoft.krd.uber.repositories.RideRepository;
 import com.skysoft.krd.uber.repositories.RiderRepository;
-import com.skysoft.krd.uber.services.DriverService;
-import com.skysoft.krd.uber.services.PaymentService;
-import com.skysoft.krd.uber.services.RideRequestService;
-import com.skysoft.krd.uber.services.RideService;
+import com.skysoft.krd.uber.services.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -38,6 +33,7 @@ public class DriverServiceImpl implements DriverService {
     private final ModelMapper modelMapper;
     private final PaymentService paymentService;
     private final RiderRepository riderRepository;
+    private final RatingService ratingService;
 
     @Override
     public RideDto acceptRide(Long rideRequestID) {
@@ -103,6 +99,7 @@ public class DriverServiceImpl implements DriverService {
         Ride savedRide= rideService.updateRideStatus(ride,RideStatus.ONGOING);
 
         paymentService.createNewPayment(savedRide);
+        ratingService.createNewRating(savedRide);
 
         return modelMapper.map(savedRide, RideDto.class);
     }
@@ -112,6 +109,7 @@ public class DriverServiceImpl implements DriverService {
     public RideDto endRide(Long rideId) {
         Ride ride=rideService.getRideById(rideId);
         Driver driver=getCurrentDriver();
+
         if(!driver.equals(ride.getDriver())){
             throw new RuntimeException("Driver can not start a ride as he has not accepted it earlier");
         }
@@ -138,16 +136,17 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDto rateRider(Long rideId, Integer rate) {
-        Rider rider=rideService.getRideById(rideId).getRider();
-        double numberOfRides = rideService.numberRidesOfRider(rider);
-        if(numberOfRides == 0){
-            numberOfRides=1;
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver=getCurrentDriver();
+        if(!driver.equals(ride.getDriver())){
+               throw new RuntimeException("Driver is not owner of ride "+rideId);
         }
-        double rating=(rider.getRating()+rate)/numberOfRides;
-        rider.setRating(rating);
-        Rider savedRider=riderRepository.save(rider);
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride status is not ENDED hence can not start rating " +
+                    ", status: "+ride.getRideStatus());
+        }
+        return ratingService.rateRider(ride,rate);
 
-        return modelMapper.map(savedRider, RiderDto.class);
     }
 
     @Override
@@ -177,6 +176,11 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public Driver updateDriverAvailability(Driver driver, boolean isAvailable) {
         driver.setAvailable(isAvailable);
+        return driverRepository.save(driver);
+    }
+
+    @Override
+    public Driver createNewDriver(Driver driver) {
         return driverRepository.save(driver);
     }
 }

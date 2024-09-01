@@ -11,6 +11,7 @@ import com.skysoft.krd.uber.repositories.DriverRepository;
 import com.skysoft.krd.uber.repositories.RideRequestRepository;
 import com.skysoft.krd.uber.repositories.RiderRepository;
 import com.skysoft.krd.uber.services.DriverService;
+import com.skysoft.krd.uber.services.RatingService;
 import com.skysoft.krd.uber.services.RideService;
 import com.skysoft.krd.uber.services.RiderService;
 import com.skysoft.krd.uber.strategies.RideStrategyManager;
@@ -37,6 +38,7 @@ public class RiderServiceImpl implements RiderService {
     private final RideService rideService;
     private final DriverService driverService;
     private final DriverRepository driverRepository;
+    private final RatingService ratingService;
 
 
     @Override
@@ -76,16 +78,16 @@ public class RiderServiceImpl implements RiderService {
 
     @Override
     public DriverDto rateDriver(Long rideId, Integer rate) {
-        Driver driver=rideService.getRideById(rideId).getDriver();
-        double numberOfRides = rideService.numberRidesOfDriver(driver);
-        if(numberOfRides == 0){
-            numberOfRides=1;
+        Ride ride = rideService.getRideById(rideId);
+        Rider rider=getCurrentRider();
+        if(!rider.equals(ride.getRider())){
+            throw new RuntimeException("Rider is not owner of ride "+rideId);
         }
-        double rating=(driver.getRating()+rate)/numberOfRides;
-        driver.setRating(rating);
-        Driver savedDriver=driverRepository.save(driver);
-
-        return modelMapper.map(savedDriver, DriverDto.class);
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride status is not ENDED hence can not start rating " +
+                    ", status: "+ride.getRideStatus());
+        }
+        return ratingService.rateDriver(ride,rate);
     }
 
     @Override

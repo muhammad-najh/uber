@@ -15,6 +15,12 @@ import java.util.Locale;
 @Entity
 @Getter
 @Setter
+@Table(
+        indexes = {
+                @Index(name = "idx_ride_request_rider",columnList = "rider_id"),
+
+        }
+)
 public class RideRequest {
 
     @Id

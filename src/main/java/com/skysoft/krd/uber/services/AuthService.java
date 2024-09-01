@@ -8,5 +8,5 @@ import org.locationtech.jts.geom.Point;
 public interface AuthService {
         String login(String username, String password);
         UserDto signup(SignupDto signupDto);
-        DriverDto onbordNewDriver(Long userId);
+        DriverDto onbordNewDriver(Long userId,String vehicleId);
 }
