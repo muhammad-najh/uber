@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,9 +116,7 @@ public class RiderServiceImpl implements RiderService {
     @Override
     public Rider getCurrentRider() {
         //TODO implement Spring Secuirty Concepts to get Current Rider Information
-
-        return riderRepository.findById(1L).orElseThrow(() -> {
-            throw new NoSuchElementException("No Rider found");
-        }); //DEMO
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return riderRepository.findByUser(user).orElseThrow(() -> new NoSuchElementException("Rider not associated with id "+user.getId()));
     }
 }

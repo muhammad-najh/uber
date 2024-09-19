@@ -2,13 +2,17 @@ package com.skysoft.krd.uber.advices;
 
 import com.skysoft.krd.uber.exceptions.ResourceNotFoundException;
 import com.skysoft.krd.uber.exceptions.RuntimeConflictException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +32,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<APIResponse<?>> handleRuntimeConflictException(RuntimeConflictException exception) {
         ApiError apiError = ApiError.builder()
                 .status(HttpStatus.CONFLICT)
+                .message(exception.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<APIResponse<?>> handleAuthenticationException(AuthenticationException exception) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(exception.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<APIResponse<?>> handleAuthenticationException(JwtException exception) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .message(exception.getMessage())
+                .build();
+        return buildErrorResponseEntity(apiError);
+    }
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<APIResponse<?>> handleAuthenticationException(AuthorizationDeniedException exception) {
+        ApiError apiError = ApiError.builder()
+                .status(HttpStatus.FORBIDDEN)
                 .message(exception.getMessage())
                 .build();
         return buildErrorResponseEntity(apiError);

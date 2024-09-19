@@ -6,6 +6,7 @@ import com.skysoft.krd.uber.dto.RiderDto;
 import com.skysoft.krd.uber.entities.Driver;
 import com.skysoft.krd.uber.entities.Ride;
 import com.skysoft.krd.uber.entities.RideRequest;
+import com.skysoft.krd.uber.entities.User;
 import com.skysoft.krd.uber.entities.enums.RideRequestStatus;
 import com.skysoft.krd.uber.entities.enums.RideStatus;
 import com.skysoft.krd.uber.exceptions.DriverNotAvailableException;
@@ -17,10 +18,12 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -169,8 +172,9 @@ public class DriverServiceImpl implements DriverService {
     public Driver getCurrentDriver() {
 
         //TODO after immplementing spring secuirty
-        // we will get current driver from spring secuirty context but for now i will use dummy
-        return driverRepository.findById(3l).orElseThrow(() -> new RuntimeException("Driver not found"));
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return driverRepository.findByUser(user).orElseThrow(() -> new NoSuchElementException("Driver not associated with id "+user.getId()));
+
     }
 
     @Override
