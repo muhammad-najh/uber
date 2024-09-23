@@ -1,0 +1,17 @@
+1// ride will be created after driver accept riderequest
+2//hardcoded value SRID 4326 Resource Ideintfer
+3//all bussines logic should be a service
+4//1.12 daq follow explanation
+5//functional interface is a part of stream API have one method and we can use lamda expression
+6// @Transaction it works in service layer and its for data consisty
+7// statgy pattern applied for stratiges in this app we have interfaces
+and there is classes implement this interface then depend on certain rule in
+stragtegy manager you will return strategy
+8// in server layer we can use @Transaction if two driver at sametime want to accept a ride
+or we can use MessageQueue in High level layer to control this.
+9// we should always try to set validations in functions in service layer first then bussiness logic
+10// to reduce amount of condtions always check for ! not this then throw
+11/book suggest(hi
+12// avoid cycled dependency using service between
+13// you cant name your table to user becuase postgres used this name
+14// we can use msg91 or brevo for sending email and we can send HTML as a content
